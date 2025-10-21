@@ -1,0 +1,31 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build frontend
+        run: docker build -t frontend-test ./frontend
+
+      - name: Test frontend
+        run: docker run -d -p 5173:5173 frontend-test && sleep 5 && curl -f http://localhost:5173 || exit 1
+
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build backend
+        run: docker build -t backend-test ./backend
+
+      - name: Test backend
+        run: docker run -d -p 5000:5000 backend-test && sleep 5 && curl -f http://localhost:5000 || exit 1
